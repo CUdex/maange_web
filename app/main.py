@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse
 import mysql.connector
 import tools
 
+# fastapi 객체 생성
 app = FastAPI()
 
 @app.get("/", response_class=HTMLResponse)
