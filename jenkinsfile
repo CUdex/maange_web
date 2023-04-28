@@ -1,11 +1,40 @@
 pipeline {
-    agent any
-
-    stages {
-        stage('Hello') {
-            steps {
-                echo 'Hello World'
-            }
+  agent any
+  environment {
+    DOCKER_REGISTRY = "docker.io"
+    DOCKER_REPO_NAME = "cudex/manage_web"
+  }
+  stages {
+     stage("Create BUILD_DATE") {
+      steps {
+        script {
+          def date = new Date()
+          def formattedDate = date.format("yyyyMMdd")
+          env.BUILD_DATE = formattedDate
         }
+      }
     }
+    stage("Clone the Repository") {
+      steps {
+        git 'https://github.com/CUdex/manage_web.git'
+      }
+    }
+    stage("Build Docker Image") {
+      steps {
+        script {
+          def dockerImage = docker.build("${env.DOCKER_REPO_NAME}:${env.BUILD_NUMBER}-${env.BUILD_DATE}")
+        }
+      }
+    }
+    stage("Push Docker Image to Docker Hub") {
+      steps {
+        script {
+          docker.withRegistry("${env.DOCKER_REGISTRY}", "docker_credential") {
+            def dockerImage = docker.image("${env.DOCKER_REPO_NAME}:${env.BUILD_NUMBER}-${env.BUILD_DATE}")
+            dockerImage.push()
+          }
+        }
+      }
+    }
+  }
 }
