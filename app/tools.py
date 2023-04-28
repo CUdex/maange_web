@@ -26,5 +26,5 @@ def readAppInfo() -> dict:
             app_info[split_text[0]][-1] = app_info[split_text[0]][-1].strip('\n')
 
     return app_info
-
+# test
 
