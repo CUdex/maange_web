@@ -26,9 +26,7 @@ pipeline {
     }
     stage('Checkout') {
         steps {
-                withCredentials([usernamePassword(credentialsId: 'test', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                git branch: 'master', credentialsId: 'test', url: "https://github.com/CUdex/vmmanager.git"
-            }
+            git branch: 'master', credentialsId: 'test', url: "https://github.com/CUdex/vmmanager.git"
         }
     }
     // stage('Checkout menifest repository') {
@@ -56,9 +54,16 @@ pipeline {
         steps {
                 // sh 'git config --global user.email "cuyu9779@gmail.com"'
                 // sh 'git config --global user.name "cudex"'
-                sh 'git add .'
+                // sh 'git add .'
+                // sh "git commit -m 'update version ${env.BUILD_NUMBER}-${env.BUILD_DATE}'"
+                // sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/CUdex/vmmanager.git"
+                withCredentials([gitUsernamePassword(credentialsId: gitCred, passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                sh "git config --global user.email 'cuyu9779@gmail.com'"
+                sh "git config --global user.name 'cudex'"
+                sh "git add ."
                 sh "git commit -m 'update version ${env.BUILD_NUMBER}-${env.BUILD_DATE}'"
                 sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/CUdex/vmmanager.git"
+            }
         }
     }
   }
