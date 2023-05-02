@@ -29,16 +29,23 @@ pipeline {
     //     git branch: 'master', credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git'
     //   }
     // }
-    stage('Checkout menifest repository') {
+    stage('Checkout') {
         steps {
-            checkout([$class: 'GitSCM',
-                      branches: [[name: '*/master']],
-                      doGenerateSubmoduleConfigurations: false,
-                      extensions: [[$class: 'CloneOption', noTags: true, reference: '', shallow: true]],
-                      submoduleCfg: [],
-                      userRemoteConfigs: [[credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git']]])
+                withCredentials([usernamePassword(credentialsId: 'test', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                git branch: 'master', credentialsId: 'test', url: "https://github.com/CUdex/vmmanager.git"
+            }
         }
     }
+    // stage('Checkout menifest repository') {
+    //     steps {
+    //         checkout([$class: 'GitSCM',
+    //                   branches: [[name: '*/master']],
+    //                   doGenerateSubmoduleConfigurations: false,
+    //                   extensions: [[$class: 'CloneOption', noTags: true, reference: '', shallow: true]],
+    //                   submoduleCfg: [],
+    //                   userRemoteConfigs: [[credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git']]])
+    //     }
+    // }
     stage('Update file') {
         steps {
             script {
@@ -52,11 +59,11 @@ pipeline {
     }
     stage('push github repository') {
         steps {
-                sh 'git config --global user.email "cuyu9779@gmail.com"'
-                sh 'git config --global user.name "CUdex"'
+                // sh 'git config --global user.email "cuyu9779@gmail.com"'
+                // sh 'git config --global user.name "cudex"'
                 sh 'git add .'
                 sh "git commit -m 'update version ${env.BUILD_NUMBER}-${env.BUILD_DATE}'"
-                sh 'git push'
+                sh 'git push origin master'
         }
     }
   }
