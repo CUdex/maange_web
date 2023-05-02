@@ -24,25 +24,20 @@ pipeline {
         sh 'ls -al'
       }
     }
-    stage("Clone the manifest Repository") {
-      steps {
-        git branch: 'master', credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git'
-      }
-    }
-    // stage('Checkout menifest repository') {
-    //     steps {
-    //         checkout([$class: 'GitSCM',
-    //                   branches: [[name: '*/master']],
-    //                   doGenerateSubmoduleConfigurations: false,
-    //                   extensions: [[$class: 'CloneOption', noTags: true, reference: '', shallow: true]],
-    //                   submoduleCfg: [],
-    //                   userRemoteConfigs: [[credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git']]])
-    //     }
+    // stage("Clone the manifest Repository") {
+    //   steps {
+    //     git branch: 'master', credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git'
+    //   }
     // }
-    stage("ls check") {
-      steps {
-        sh 'ls -al'
-      }
+    stage('Checkout menifest repository') {
+        steps {
+            checkout([$class: 'GitSCM',
+                      branches: [[name: '*/master']],
+                      doGenerateSubmoduleConfigurations: false,
+                      extensions: [[$class: 'CloneOption', noTags: true, reference: '', shallow: true]],
+                      submoduleCfg: [],
+                      userRemoteConfigs: [[credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git']]])
+        }
     }
     stage('Update file') {
         steps {
