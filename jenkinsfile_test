@@ -24,21 +24,21 @@ pipeline {
         sh 'ls -al'
       }
     }
-    // stage("Clone the manifest Repository") {
-    //   steps {
-    //     git branch: 'master', credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git'
-    //   }
-    // }
-    stage('Checkout menifest repository') {
-        steps {
-            checkout([$class: 'GitSCM',
-                      branches: [[name: '*/master']],
-                      doGenerateSubmoduleConfigurations: false,
-                      extensions: [[$class: 'CloneOption', noTags: true, reference: '', shallow: true]],
-                      submoduleCfg: [],
-                      userRemoteConfigs: [[credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git']]])
-        }
+    stage("Clone the manifest Repository") {
+      steps {
+        git branch: 'master', credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git'
+      }
     }
+    // stage('Checkout menifest repository') {
+    //     steps {
+    //         checkout([$class: 'GitSCM',
+    //                   branches: [[name: '*/master']],
+    //                   doGenerateSubmoduleConfigurations: false,
+    //                   extensions: [[$class: 'CloneOption', noTags: true, reference: '', shallow: true]],
+    //                   submoduleCfg: [],
+    //                   userRemoteConfigs: [[credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git']]])
+    //     }
+    // }
     stage("ls check") {
       steps {
         sh 'ls -al'
@@ -50,13 +50,15 @@ pipeline {
                     // 파일 내용 변경하기
                     def filePath = './web.yaml'
                     def fileContent = sh(script: "cat ${filePath}", returnStdout: true).trim()
-                    def newContent = fileContent.replace(/image: cudex\/manage_web:.*/, "image: cudex/manage_web:${env.BUILD_NUMBER}-${env.BUILD_DATE}")
+                    def newContent = fileContent.replace("/image: cudex\/manage_web:.*/", "image: cudex/manage_web:${env.BUILD_NUMBER}-${env.BUILD_DATE}")
                     sh "echo '${newContent}' > ${filePath}"
             }
         }
     }
-    stage('Commit changes') {
+    stage('push github repository') {
         steps {
+                sh 'git config --global user.email "cuyu9779@gmail.com"'
+                sh 'git config --global user.name "cudex"'
                 sh 'git add .'
                 sh "git commit -m 'update version ${env.BUILD_NUMBER}-${env.BUILD_DATE}'"
                 sh 'git push origin master'
