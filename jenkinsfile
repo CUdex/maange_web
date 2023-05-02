@@ -46,10 +46,16 @@ pipeline {
         git branch: 'main', credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git'
       }
     }
-    stage("change container version in manifest") {
-      steps {
-        
-      }
+    stage('change container version in manifest file') {
+        steps {
+            script {
+                // 파일 내용 변경하기
+                def filePath = './web.yaml'
+                def fileContent = sh(script: "cat ${filePath}", returnStdout: true).trim()
+                def newContent = fileContent.replace("image: cudex/manage_web:1.0", "image: cudex/manage_web:${env.BUILD_NUMBER}-${env.BUILD_DATE}")
+                sh "echo '${newContent}' > ${filePath}"
+            }
+        }
     }
   }
 }
