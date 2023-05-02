@@ -36,5 +36,20 @@ pipeline {
         }
       }
     }
+    stage('Delete Docker image') {
+      steps {
+        sh "docker rmi -f ${env.DOCKER_REPO_NAME}:${env.BUILD_NUMBER}-${env.BUILD_DATE}"
+      }
+    }
+    stage("Clone the manifest Repository") {
+      steps {
+        git branch: 'main', credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git'
+      }
+    }
+    stage("change container version in manifest") {
+      steps {
+        
+      }
+    }
   }
 }

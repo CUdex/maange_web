@@ -1,0 +1,33 @@
+pipeline {
+  agent any
+  environment {
+    DOCKER_REGISTRY = "https://docker.io/cudex/manage_web"
+    DOCKER_REPO_NAME = "cudex/manage_web"
+  }
+  stages {
+     stage("Create BUILD_DATE") {
+      steps {
+        script {
+          def date = new Date()
+          def formattedDate = date.format("yyyyMMdd")
+          env.BUILD_DATE = formattedDate
+        }
+      }
+    }
+    stage("Clone the Repository") {
+      steps {
+        git branch: 'main', url: 'https://github.com/CUdex/manage_web.git'
+      }
+    }
+    stage("Clone the manifest Repository") {
+      steps {
+        git branch: 'main', credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git'
+      }
+    }
+    stage("ls check") {
+      steps {
+        sh 'ls -al'
+      }
+    }
+  }
+}
