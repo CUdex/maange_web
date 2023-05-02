@@ -53,10 +53,10 @@ pipeline {
     stage('push github repository') {
         steps {
                 sh 'git config --global user.email "cuyu9779@gmail.com"'
-                sh 'git config --global user.name "cudex"'
+                sh 'git config --global user.name "CUdex"'
                 sh 'git add .'
                 sh "git commit -m 'update version ${env.BUILD_NUMBER}-${env.BUILD_DATE}'"
-                sh 'git push origin master'
+                sh 'git push -u origin master'
         }
     }
   }
