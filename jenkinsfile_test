@@ -56,7 +56,7 @@ pipeline {
                 sh 'git config --global user.name "CUdex"'
                 sh 'git add .'
                 sh "git commit -m 'update version ${env.BUILD_NUMBER}-${env.BUILD_DATE}'"
-                sh 'git push -u origin master'
+                sh 'git push'
         }
     }
   }
