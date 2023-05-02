@@ -19,6 +19,11 @@ pipeline {
         git branch: 'main', url: 'https://github.com/CUdex/manage_web.git'
       }
     }
+    stage("first ls check") {
+      steps {
+        sh 'ls -al'
+      }
+    }
     stage("Clone the manifest Repository") {
       steps {
         git branch: 'master', credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git'
