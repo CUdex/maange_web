@@ -24,14 +24,9 @@ pipeline {
         sh 'ls -al'
       }
     }
-    // stage("Clone the manifest Repository") {
-    //   steps {
-    //     git branch: 'master', credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git'
-    //   }
-    // }
     stage('Checkout') {
         steps {
-                withCredentials([usernamePassword(credentialsId: 'test', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'test', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                 git branch: 'master', credentialsId: 'test', url: "https://github.com/CUdex/vmmanager.git"
             }
         }
@@ -63,7 +58,7 @@ pipeline {
                 // sh 'git config --global user.name "cudex"'
                 sh 'git add .'
                 sh "git commit -m 'update version ${env.BUILD_NUMBER}-${env.BUILD_DATE}'"
-                sh 'git push origin master'
+                sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/CUdex/vmmanager.git"
         }
     }
   }
