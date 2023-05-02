@@ -34,5 +34,28 @@ pipeline {
         sh 'ls -al'
       }
     }
+    stage("change version") {
+      steps {
+        sh 'ls -al'
+      }
+    }
+    stage('Update file') {
+            steps {
+                script {
+                    // 파일 내용 변경하기
+                    def filePath = './web.yaml'
+                    def fileContent = sh(script: "cat ${filePath}", returnStdout: true).trim()
+                    def newContent = fileContent.replace('image: cudex/manage_web:1.0', 'image: cudex/manage_web:${env.BUILD_NUMBER}-${env.BUILD_DATE}')
+                    sh "echo '${newContent}' > ${filePath}"
+                }
+            }
+        }
+        stage('Commit changes') {
+            steps {
+                sh 'git add .'
+                sh 'git commit -m "update version ${env.BUILD_NUMBER}-${env.BUILD_DATE}"'
+                sh 'git push origin master'
+            }
+        }
   }
 }
