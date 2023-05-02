@@ -1,7 +1,7 @@
 pipeline {
   agent any
   environment {
-    DOCKER_REGISTRY = "docker.io"
+    DOCKER_REGISTRY = "https://docker.io/cudex/manage_web"
     DOCKER_REPO_NAME = "cudex/manage_web"
   }
   stages {
@@ -29,7 +29,7 @@ pipeline {
     stage("Push Docker Image to Docker Hub") {
       steps {
         script {
-          docker.withRegistry("${env.DOCKER_REGISTRY}", "docker_credential") {
+          docker.withRegistry("", "docker_credential") {
             def dockerImage = docker.image("${env.DOCKER_REPO_NAME}:${env.BUILD_NUMBER}-${env.BUILD_DATE}")
             dockerImage.push()
           }
