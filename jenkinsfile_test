@@ -50,7 +50,7 @@ pipeline {
                     // 파일 내용 변경하기
                     def filePath = './web.yaml'
                     def fileContent = sh(script: "cat ${filePath}", returnStdout: true).trim()
-                    def newContent = fileContent.replace("/image: cudex\/manage_web:.*/", "image: cudex/manage_web:${env.BUILD_NUMBER}-${env.BUILD_DATE}")
+                    def newContent = fileContent.replaceAll(/image: cudex\/manage_web:.*/, "image: cudex/manage_web:${env.BUILD_NUMBER}-${env.BUILD_DATE}")
                     sh "echo '${newContent}' > ${filePath}"
             }
         }
