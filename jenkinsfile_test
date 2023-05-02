@@ -21,7 +21,7 @@ pipeline {
     }
     stage("Clone the manifest Repository") {
       steps {
-        git branch: 'main', credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git'
+        git branch: 'master', credentialsId: 'test', url: 'https://github.com/CUdex/vmmanager.git'
       }
     }
     stage("ls check") {
