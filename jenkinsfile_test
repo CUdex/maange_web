@@ -45,7 +45,7 @@ pipeline {
                 sh "git config --global user.name 'cudex'"
                 sh "git add ."
                 sh "git commit -m 'update version ${test_version}'"
-                sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/CUdex/vmmanager.git"
+                sh 'git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/CUdex/vmmanager.git'
             }
         }
     }
