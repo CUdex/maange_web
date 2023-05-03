@@ -41,12 +41,15 @@ pipeline {
     stage('push github repository') {
         steps {
                 withCredentials([gitUsernamePassword(credentialsId: 'test', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                sh "git config --global user.email 'cuyu9779@gmail.com'"
-                sh "git config --global user.name 'jenkins'"
                 sh "git add ."
                 sh "git commit -m '[ci skip] update version ${test_version}'"
                 sh 'git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/CUdex/vmmanager.git'
             }
+        }
+    }
+    stage('Checkout') {
+        steps {
+            git branch: 'master', credentialsId: 'test', url: "https://github.com/CUdex/manage_web.git"
         }
     }
   }

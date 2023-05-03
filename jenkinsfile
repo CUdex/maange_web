@@ -67,8 +67,6 @@ pipeline {
     stage('push github repository') {
      steps {
                 withCredentials([gitUsernamePassword(credentialsId: 'test', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                sh "git config --global user.email 'cuyu9779@gmail.com'"
-                sh "git config --global user.name 'cudex'"
                 sh "git add ."
                 sh "git commit -m 'update version ${app_version}'"
                 sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/CUdex/vmmanager.git"
