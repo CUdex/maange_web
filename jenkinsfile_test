@@ -28,7 +28,7 @@ pipeline {
     }
     stage('Checkout') {
         steps {
-            git branch: 'master', credentialsId: 'test', url: "https://github.com/CUdex/vmmanager.git"
+            git branch: 'argo', credentialsId: 'test', url: "https://github.com/CUdex/vmmanager.git"
         }
     }
 
