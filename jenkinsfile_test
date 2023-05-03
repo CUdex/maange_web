@@ -5,7 +5,12 @@ pipeline {
     DOCKER_REPO_NAME = "cudex/manage_web"
   }
   stages {
-     stage("Create BUILD_DATE") {
+    stage('Checkout') {
+        steps {
+            scmSkip(deleteBuild: true, skipPattern:'.*\\[ci skip\\].*')
+        }
+    }
+    stage("Create BUILD_DATE") {
       steps {
         script {
           def date = new Date()
@@ -45,11 +50,6 @@ pipeline {
                 sh "git commit -m '[ci skip] update version ${test_version}'"
                 sh 'git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/CUdex/vmmanager.git'
             }
-        }
-    }
-    stage('Checkout') {
-        steps {
-            git branch: 'master', credentialsId: 'test', url: "https://github.com/CUdex/manage_web.git"
         }
     }
   }
