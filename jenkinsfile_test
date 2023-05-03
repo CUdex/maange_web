@@ -7,7 +7,7 @@ pipeline {
   stages {
     stage('Checkout') {
         steps {
-            scmSkip(deleteBuild: true, skipPattern:'.*\\[cc\\].*')
+            scmSkip(deleteBuild: true, skipPattern:'.*update.*')
         }
     }
     stage("Create BUILD_DATE") {
@@ -47,7 +47,7 @@ pipeline {
         steps {
                 withCredentials([gitUsernamePassword(credentialsId: 'test', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                 sh "git add ."
-                sh "git commit -m '[ci skip] update version ${test_version}'"
+                sh "git commit -m 'update version ${test_version}'"
                 sh 'git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/CUdex/vmmanager.git'
             }
         }
