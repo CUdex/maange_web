@@ -6,9 +6,6 @@ pipeline {
   }
   stages {
      stage("Create BUILD_DATE") {
-      when {
-        branch 'main'
-      }  
       steps {
         script {
           def date = new Date()
