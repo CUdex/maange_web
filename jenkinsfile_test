@@ -5,11 +5,11 @@ pipeline {
     DOCKER_REPO_NAME = "cudex/manage_web"
   }
   stages {
-    stage('Checkout') {
-        steps {
-            scmSkip(deleteBuild: false, skipPattern:'.*update.*')
-        }
-    }
+    // stage('Checkout') {
+    //     steps {
+    //         scmSkip(deleteBuild: false, skipPattern:'.*update.*')
+    //     }
+    // }
     stage("Create BUILD_DATE") {
       steps {
         script {
