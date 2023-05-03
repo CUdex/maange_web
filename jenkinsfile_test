@@ -7,7 +7,7 @@ pipeline {
   stages {
     stage('Checkout') {
         steps {
-            scmSkip(deleteBuild: true, skipPattern:'.*update.*')
+            scmSkip(deleteBuild: false, skipPattern:'.*update.*')
         }
     }
     stage("Create BUILD_DATE") {
