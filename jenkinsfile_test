@@ -16,11 +16,6 @@ pipeline {
         }
       }
     }
-    stage("Clone the Repository") {
-      steps {
-        git branch: 'main', url: 'https://github.com/CUdex/manage_web.git'
-      }
-    }
     stage("first ls check") {
       steps {
         sh 'ls -al'
