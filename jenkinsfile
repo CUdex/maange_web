@@ -11,6 +11,8 @@ pipeline {
           def date = new Date()
           def formattedDate = date.format("yyyyMMdd")
           env.BUILD_DATE = formattedDate
+
+          app_version = "${env.DOCKER_REPO_NAME}:1.${env.BUILD_NUMBER}-${env.BUILD_DATE}"
         }
       }
     }
@@ -22,7 +24,7 @@ pipeline {
     stage("Build Docker Image") {
       steps {
         script {
-          def dockerImage = docker.build("${env.DOCKER_REPO_NAME}:${env.BUILD_NUMBER}-${env.BUILD_DATE}")
+          def dockerImage = docker.build("${app_version}")
         }
       }
     }
@@ -30,7 +32,7 @@ pipeline {
       steps {
         script {
           docker.withRegistry("", "docker_credential") {
-            def dockerImage = docker.image("${env.DOCKER_REPO_NAME}:${env.BUILD_NUMBER}-${env.BUILD_DATE}")
+            def dockerImage = docker.image("${app_version}")
             dockerImage.push()
           }
         }
@@ -38,7 +40,7 @@ pipeline {
     }
     stage('Delete Docker image') {
       steps {
-        sh "docker rmi -f ${env.DOCKER_REPO_NAME}:${env.BUILD_NUMBER}-${env.BUILD_DATE}"
+        sh "docker rmi -f ${app_version}"
       }
     }
     stage("Clone the manifest Repository") {
@@ -52,7 +54,7 @@ pipeline {
             // 파일 내용 변경하기
             def filePath = './web.yaml'
             def fileContent = sh(script: "cat ${filePath}", returnStdout: true).trim()
-            def newContent = fileContent.replaceAll(/image: cudex\/manage_web:.*/, "image: cudex/manage_web:${env.BUILD_NUMBER}-${env.BUILD_DATE}")
+            def newContent = fileContent.replaceAll(/image: cudex\/manage_web:.*/, "image: ${app_version}")
             sh "echo '${newContent}' > ${filePath}"
         }
       }
@@ -63,7 +65,7 @@ pipeline {
                 sh "git config --global user.email 'cuyu9779@gmail.com'"
                 sh "git config --global user.name 'cudex'"
                 sh "git add ."
-                sh "git commit -m 'update version ${env.BUILD_NUMBER}-${env.BUILD_DATE}'"
+                sh "git commit -m 'update version ${app_version}'"
                 sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/CUdex/vmmanager.git"
             }
      }

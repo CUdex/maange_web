@@ -12,14 +12,47 @@ pipeline {
           def formattedDate = date.format("yyyyMMdd")
           env.BUILD_DATE = formattedDate
 
-          test_version = "${env.DOCKER_REPO_NAME}:1.${env.BUILD_NUMBER}-${env.BUILD_DATE}"
+          test_version = "${DOCKER_REPO_NAME}:1.${env.BUILD_NUMBER}-${env.BUILD_DATE}"
         }
       }
     }
     stage("Clone the Repository") {
       steps {
-        sh "echo ${test_version}"
+        git branch: 'main', url: 'https://github.com/CUdex/manage_web.git'
       }
+    }
+    stage("first ls check") {
+      steps {
+        sh 'ls -al'
+      }
+    }
+    stage('Checkout') {
+        steps {
+            git branch: 'master', credentialsId: 'test', url: "https://github.com/CUdex/vmmanager.git"
+        }
+    }
+
+    stage('Update file') {
+        steps {
+            script {
+                    // 파일 내용 변경하기
+                    def filePath = './web.yaml'
+                    def fileContent = sh(script: "cat ${filePath}", returnStdout: true).trim()
+                    def newContent = fileContent.replaceAll(/image: cudex\/manage_web:.*/, "image: ${test_version}")
+                    sh "echo '${newContent}' > ${filePath}"
+            }
+        }
+    }
+    stage('push github repository') {
+        steps {
+                withCredentials([gitUsernamePassword(credentialsId: 'test', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                sh "git config --global user.email 'cuyu9779@gmail.com'"
+                sh "git config --global user.name 'cudex'"
+                sh "git add ."
+                sh "git commit -m 'update version ${test_version}'"
+                sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/CUdex/vmmanager.git"
+            }
+        }
     }
   }
 }
