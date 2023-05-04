@@ -1,33 +1,33 @@
-pipeline {
-  agent any
-  environment {
-    DOCKER_REGISTRY = "https://docker.io/cudex/manage_web"
-    DOCKER_REPO_NAME = "cudex/manage_web"
-  }
-  stages {
-    stage("Create BUILD_DATE") {
-      steps {
-        script {
-          def date = new Date()
-          def formattedDate = date.format("yyyyMMdd")
-          env.BUILD_DATE = formattedDate
+// pipeline {
+//   agent any
+//   environment {
+//     DOCKER_REGISTRY = "https://docker.io/cudex/manage_web"
+//     DOCKER_REPO_NAME = "cudex/manage_web"
+//   }
+//   stages {
+//     stage("Create BUILD_DATE") {
+//       steps {
+//         script {
+//           def date = new Date()
+//           def formattedDate = date.format("yyyyMMdd")
+//           env.BUILD_DATE = formattedDate
 
-          test_version = "${DOCKER_REPO_NAME}:1.${env.BUILD_NUMBER}-${env.BUILD_DATE}"
-        }
-      }
-    }
-    stage("first ls check") {
-      steps {
-        sh 'ls -al'
-      }
-    }
-    stage('Trigger Job B') {
-      steps {
-        script {
-          def WEB_VERSION = "${test_version}"
-          writeFile(file: '/home/jenkins/WEB_VERSION.txt', text: WEB_VERSION)
-        }
-      }
-    }
-  }
-}
+//           test_version = "${DOCKER_REPO_NAME}:1.${env.BUILD_NUMBER}-${env.BUILD_DATE}"
+//         }
+//       }
+//     }
+//     stage("first ls check") {
+//       steps {
+//         sh 'ls -al'
+//       }
+//     }
+//     stage('Trigger Job B') {
+//       steps {
+//         script {
+//           def WEB_VERSION = "${test_version}"
+//           writeFile(file: '/home/jenkins/WEB_VERSION.txt', text: WEB_VERSION)
+//         }
+//       }
+//     }
+//   }
+// }

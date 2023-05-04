@@ -23,6 +23,7 @@ pipeline {
         }
       }
     }
+
     stage("Push Docker Image to Docker Hub") {
       steps {
         script {
@@ -33,9 +34,18 @@ pipeline {
         }
       }
     }
+
     stage('Delete Docker image') {
       steps {
         sh "docker rmi -f ${WEB_VERSION}"
+      }
+    }
+
+    stage('Save Web Version') {
+      steps {
+        script {
+          writeFile(file: '/home/jenkins/WEB_VERSION.txt', text: WEB_VERSION)
+        }
       }
     }
   }
