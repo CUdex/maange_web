@@ -59,3 +59,12 @@ pipeline {
     }
   }
 }
+
+properties([
+  pipelineTriggers([
+    [ $class: 'PollingGitSCMTrigger',
+      ignorePostCommitHooks: true,
+      branches: [[compare: 'NOT_EQUAL', value: 'refs/heads/argo']],
+      spec: 'H/2 * * * *']
+  ])
+])
