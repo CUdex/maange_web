@@ -25,7 +25,8 @@ pipeline {
       steps {
         script {
           def WEB_VERSION = "${test_version}"
-          stash name: 'myStash', includes: 'WEB_VERSION'
+          writeFile(file: 'WEB_VERSION.txt', text: WEB_VERSION)
+          stash name: 'WV_Stash', includes: 'WEB_VERSION.txt'
         }
       }
     }
