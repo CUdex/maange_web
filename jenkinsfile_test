@@ -29,6 +29,7 @@ pipeline {
     stage('change version') {
         steps {
             sh "export WEB_VERSION=${test_version}"
+            sh "env"
             
         }
     }
