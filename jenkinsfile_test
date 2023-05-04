@@ -23,8 +23,10 @@ pipeline {
     }
     stage('Trigger Job B') {
       steps {
-        def WEB_VERSION = "${test_version}"
-        stash name: 'myStash', includes: 'WEB_VERSION'
+        script {
+          def WEB_VERSION = "${test_version}"
+          stash name: 'myStash', includes: 'WEB_VERSION'
+        }
       }
     }
   }
