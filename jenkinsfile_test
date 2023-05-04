@@ -5,11 +5,6 @@ pipeline {
     DOCKER_REPO_NAME = "cudex/manage_web"
   }
   stages {
-    // stage('Checkout') {
-    //     steps {
-    //         scmSkip(deleteBuild: false, skipPattern:'.*update.*')
-    //     }
-    // }
     stage("Create BUILD_DATE") {
       steps {
         script {
@@ -26,45 +21,10 @@ pipeline {
         sh 'ls -al'
       }
     }
-    stage('Checkout') {
+    stage('change version') {
         steps {
-            git branch: 'argo', credentialsId: 'test', url: "https://github.com/CUdex/vmmanager.git"
+            sh 'export WEB_VERSION=${test_version}'
         }
-    }
-
-    stage('Update file') {
-        steps {
-            script {
-                    // 파일 내용 변경하기
-                    def filePath = './web.yaml'
-                    def fileContent = sh(script: "cat ${filePath}", returnStdout: true).trim()
-                    def newContent = fileContent.replaceAll(/image: cudex\/manage_web:.*/, "image: ${test_version}")
-                    sh "echo '${newContent}' > ${filePath}"
-            }
-        }
-    }
-    stage('push github repository') {
-        steps {
-                withCredentials([gitUsernamePassword(credentialsId: 'test', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                sh "git add ."
-                sh "git commit -m 'update version ${test_version}'"
-                sh 'git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/CUdex/vmmanager.git'
-            }
-        }
-    }
-  }
-  post {
-    always {
-      deleteDir()
     }
   }
 }
-
-properties([
-  pipelineTriggers([
-    [ $class: 'PollingGitSCMTrigger',
-      ignorePostCommitHooks: true,
-      branches: [[compare: 'NOT_EQUAL', value: 'refs/heads/argo']],
-      spec: 'H/2 * * * *']
-  ])
-])
