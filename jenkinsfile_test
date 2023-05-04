@@ -5,6 +5,11 @@ pipeline {
     DOCKER_REPO_NAME = "cudex/manage_web"
   }
   stages {
+    // stage('Checkout') {
+    //   steps {
+    //             git branch: 'main', credentialsId: 'test', url: "https://github.com/CUdex/manage_web.git"
+    //         }
+    // }
     stage("Create BUILD_DATE") {
       steps {
         script {
