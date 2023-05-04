@@ -26,12 +26,10 @@ pipeline {
         sh 'ls -al'
       }
     }
-    stage('change version') {
-        steps {
-            sh "export WEB_VERSION=${test_version}"
-            sh "env"
-            
-        }
+    stage('Trigger Job B') {
+      steps {
+        build job: 'test_echo', parameters: [string(name: 'WEB_VERSION', value: "${test_version}")]
+      }
     }
   }
 }
