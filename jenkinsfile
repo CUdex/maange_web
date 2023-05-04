@@ -38,10 +38,5 @@ pipeline {
         sh "docker rmi -f ${WEB_VERSION}"
       }
     }
-    stage('change version') {
-        steps {
-            sh 'export WEB_VERSION=${WEB_VERSION}'
-        }
-    }
   }
 }
