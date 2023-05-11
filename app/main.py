@@ -36,6 +36,10 @@ def read_root():
         for i, value in enumerate(x):
             if i == 0:
                 result += "<td>" + str(value[:-4]) + "</td>"
+            elif i == 5:
+                #자동 종료 예외 vm의 경우 exception으로 출력되도록 수정
+                result_except_value = tools.check_except_auto_shutdown(value, x[0], db_info['ignore_vm'])
+                result += "<td>" + str(result_except_value) + "</td>"
             else:
                 result += "<td>" + str(value) + "</td>"
         result += "</tr>"

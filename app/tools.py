@@ -26,5 +26,7 @@ def readAppInfo() -> dict:
             app_info[split_text[0]][-1] = app_info[split_text[0]][-1].strip('\n')
 
     return app_info
-# test
 
+#except된 vm의 경우 boottime이 exception으로 나오도록 처리
+def check_except_auto_shutdown(boot_time, vm_name, except_list):
+    return "exception" if vm_name in except_list else boot_time
