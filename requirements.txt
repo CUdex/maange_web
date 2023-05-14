@@ -3,3 +3,4 @@ fastapi
 httptools
 uvloop
 uvicorn
+Jinja2

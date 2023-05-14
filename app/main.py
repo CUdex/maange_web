@@ -1,14 +1,16 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 import mysql.connector
 import tools
+from fastapi.templating import Jinja2Templates
 
 # fastapi 객체 생성
 app = FastAPI()
+#jinja templates
+templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
-def read_root():
-
+async def read_root(request: Request):
     db_info = tools.readAppInfo()
     # MySQL 연결 설정
     mydb = mysql.connector.connect(
@@ -23,73 +25,26 @@ def read_root():
     mycursor.execute("SELECT * FROM vm_list")
 
     # 쿼리 결과 출력
-    result = "<table class='styled-table'>"
-    result += "<thead>"
-    result += "<tr>"
+    title = []
+    vm_list = []
     for x in mycursor.description:
-        result += "<th>" + str(x[0]) + "</th>"
-    result += "</tr>"
-    result += "</thead>"
-    result += "<tbody>"
+        title.append(str(x[0]))
     for x in mycursor:
-        result += "<tr>"
+        individual_vm = []
         for i, value in enumerate(x):
             if i == 0:
-                result += "<td>" + str(value[:-4]) + "</td>"
+                individual_vm.append(str(value[:-4]))
             elif i == 5:
                 #자동 종료 예외 vm의 경우 exception으로 출력되도록 수정
                 result_except_value = tools.check_except_auto_shutdown(value, x[0], db_info['ignore_vm'])
-                result += "<td>" + str(result_except_value) + "</td>"
+                individual_vm.append(str(result_except_value))
             else:
-                result += "<td>" + str(value) + "</td>"
-        result += "</tr>"
-    result += "</tbody>"
-    result += "</table>"
-
+                individual_vm.append(str(value))
+        vm_list.append(individual_vm)
     
     # MySQL 연결 종료
     mycursor.close()
     mydb.close()
 
-    style = """
-        <style>
-            .styled-table {
-                border-collapse: collapse;
-                margin: 25px 0;
-                font-size: 0.9em;
-                font-family: sans-serif;
-                min-width: 400px;
-                box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-            }
-
-            .styled-table thead tr {
-                background-color: #009879;
-                color: #ffffff;
-                text-align: center;
-            }
-
-            .styled-table th,
-            .styled-table td {
-                padding: 12px 15px;
-            }
-
-            .styled-table tbody tr {
-                border-bottom: 1px solid #dddddd;
-            }
-
-            .styled-table tbody tr:nth-of-type(even) {
-                background-color: #f3f3f3;
-            }
-
-            .styled-table tbody tr:last-of-type {
-                border-bottom: 2px solid #009879;
-            }
-
-            .styled-table tbody td {
-                text-align: center;
-            }
-        </style>
-    """
-
-    return style + result
+    return templates.TemplateResponse("all_vm.html", {"request": request, "title": title, "vm_list": vm_list})
 
