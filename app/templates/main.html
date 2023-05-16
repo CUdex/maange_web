@@ -1,0 +1,66 @@
+<html>
+<head>
+    <title>All VM LIST</title>
+</head>
+<style>
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+  
+    .esxi_button {
+      width: 300px;
+      height: 300px;
+      margin: 10px;
+      border: none;
+      background-color: gray;
+      color: white;
+      font-size: 24px;
+      transition: background-color 0.3s; /* 배경색이 부드럽게 변하도록 효과를 추가합니다. */
+    }
+
+    .cloud_button {
+      width: 300px;
+      height: 300px;
+      margin: 10px;
+      border: none;
+      background-color: blue;
+      color: white;
+      font-size: 24px;
+      transition: background-color 0.3s; /* 배경색이 부드럽게 변하도록 효과를 추가합니다. */
+    }
+  
+    .text {
+      position: relative;
+      top: 10%;
+      font-size: 36px;
+      color: black;
+    }
+  
+    /* 버튼에 마우스를 올리면 배경색이 빨간색으로 바뀝니다. */
+    .esxi_button:hover, .cloud_button:hover{
+      background-color: purple;
+    }
+  </style>
+  
+  <div class="container">
+    <div class="text">Select Resource Management</div>
+    <div>
+        <button class="esxi_button" id="button1">ESXi</button>
+        <button class="cloud_button" id="button2">CLOUD</button>
+    </div>
+  </div>
+  
+  <script>
+    document.getElementById("button1").addEventListener("click", function() {
+      window.location.pathname = "/vm_list";
+    });
+  
+    document.getElementById("button2").addEventListener("click", function() {
+      alert("open soon");
+    });
+  </script>
+  

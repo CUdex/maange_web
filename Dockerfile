@@ -12,5 +12,5 @@ WORKDIR /app
 EXPOSE 80
 
 # run server
-CMD ["/usr/local/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["python3", "main.py"]
 

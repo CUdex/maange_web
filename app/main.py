@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse
 import mysql.connector
 import tools
 from fastapi.templating import Jinja2Templates
+import uvicorn
 
 # fastapi 객체 생성
 app = FastAPI()
@@ -11,6 +12,11 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
+
+    return templates.TemplateResponse("main.html", {"request": request})
+
+@app.get("/vm_list", response_class=HTMLResponse)
+async def search_vm(request: Request, vm_name: str = ""):
     db_info = tools.readAppInfo()
     # MySQL 연결 설정
     mydb = mysql.connector.connect(
@@ -22,7 +28,10 @@ async def read_root(request: Request):
 
     # 쿼리 실행
     mycursor = mydb.cursor()
-    mycursor.execute("SELECT * FROM vm_list")
+    if not vm_name == "":
+        mycursor.execute("SELECT * FROM vm_list where vm_name like \'%" + vm_name + "%\'")
+    else:
+        mycursor.execute("SELECT * FROM vm_list")
 
     # 쿼리 결과 출력
     title = []
@@ -48,3 +57,5 @@ async def read_root(request: Request):
 
     return templates.TemplateResponse("all_vm.html", {"request": request, "title": title, "vm_list": vm_list})
 
+if __name__=='__main__':
+    uvicorn.run(app, host='0.0.0.0', port = 80)
