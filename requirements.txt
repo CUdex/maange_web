@@ -4,3 +4,4 @@ httptools
 uvloop
 uvicorn
 Jinja2
+plotly
