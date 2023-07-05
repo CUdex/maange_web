@@ -5,3 +5,4 @@ uvloop
 uvicorn
 Jinja2
 plotly
+boto3
