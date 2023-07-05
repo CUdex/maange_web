@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>All Instance LIST</title>
+    </head>
+    <style>
+        .main_title {
+            text-align: center;
+            font-size: 30px;
+        }
+        .main_title p {
+            margin: 20px;
+        }
+        .main_list {
+            width: 700px;
+            margin: 0 auto;
+        }
+        .list_start {
+            text-align: center;
+        }
+        .list_detail {
+            transition: transform 0.3s;
+            display: inline-block;
+            
+            width: 220px;
+            height: 260px;
+            border: 1px solid;
+            margin-bottom: 5px;
+        }
+        .list_detail:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+    <body>
+        {% include "main_header.html" %}
+        {% for key, value in instance_data.items() %}
+        <div class="main_list">
+            <div class="main_title">
+                <p>{{ key }}</p>
+            </div>
+            <div class="list_start">
+                {% for instance in value %}
+                    <div class="list_detail">
+                        <h5>{{ instance.InstanceName }}</h5>
+                        <p>{{ instance.State }}</p>
+                        <p>ID: {{ instance.InstanceID }}</p>
+                        <p>Type: {{ instance.InstanceType }}</p>
+                        <p>Private IP: {{ instance.PrivateIP }}</p>
+                        <p>Public IP: {{ instance.PublicIP }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </body>    
+</html>
+

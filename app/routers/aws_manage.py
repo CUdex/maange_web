@@ -1,9 +1,8 @@
 from fastapi import Request
 from fastapi.responses import HTMLResponse
-import mysql.connector
-import tools
 from fastapi.templating import Jinja2Templates
 from fastapi import APIRouter
+import awsTools
 
 router = APIRouter(prefix='/cloud_list')
 
@@ -11,6 +10,16 @@ router = APIRouter(prefix='/cloud_list')
 templates = Jinja2Templates(directory="templates")
 
 @router.get("", response_class=HTMLResponse)
-async def search_vm(request: Request, vm_name: str = ""):
-    
-    return {'message': 'Hello'}
+async def cloud_list(request: Request):
+
+    instance_data = awsTools.getInstance()
+    vpc_name = awsTools.getVpc()
+
+    items = {}
+    for key, value in vpc_name.items():
+        items[value] = []
+        for instance in instance_data:
+            if key == instance['InstanceVPC']:
+                items[value].append(instance)   
+
+    return templates.TemplateResponse("cloud_status.html", {"request": request, "instance_data": items})
