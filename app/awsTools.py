@@ -37,3 +37,12 @@ def getVpc():
         vpcs[vpc.get('VpcId')] = next((tag['Value'] for tag in vpc.get('Tags', []) if tag['Key'] == 'Name'), 'no_name_vpc')
 
     return vpcs
+
+def stopInstance(instance_id):
+    ec2 = boto3.client('ec2')
+    ec2.stop_instances(InstanceIds=[instance_id])
+
+
+def startInstance(instance_id):
+    ec2 = boto3.client('ec2')
+    ec2.start_instances(InstanceIds=[instance_id])

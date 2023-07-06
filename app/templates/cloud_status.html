@@ -19,16 +19,27 @@
             text-align: center;
         }
         .list_detail {
-            transition: transform 0.3s;
+            transition: transform 0.3s ease;
             display: inline-block;
             
             width: 220px;
-            height: 260px;
+            height: 300px;
             border: 1px solid;
             margin-bottom: 5px;
         }
         .list_detail:hover {
             transform: translateY(-5px);
+        }
+        .power {
+            padding: 5px 0px 5px 0px;
+            border-radius: 5px;
+            font-size: 15px;
+            width: 100px;
+            border: none;
+            transition: transform 0.3s ease;
+        }
+        .power:hover {
+            transform: scale(1.1);
         }
     </style>
     <body>
@@ -41,17 +52,49 @@
             <div class="list_start">
                 {% for instance in value %}
                     <div class="list_detail">
-                        <h5>{{ instance.InstanceName }}</h5>
+                        <h4>{{ instance.InstanceName }}</h4>
                         <p>{{ instance.State }}</p>
                         <p>ID: {{ instance.InstanceID }}</p>
                         <p>Type: {{ instance.InstanceType }}</p>
                         <p>Private IP: {{ instance.PrivateIP }}</p>
                         <p>Public IP: {{ instance.PublicIP }}</p>
+                        <button class="power" data-text="{{ instance.State }}"></button>
                     </div>
                 {% endfor %}
             </div>
         </div>
         {% endfor %}
     </body>    
+    <script>
+        // 버튼 스타일 및 내용 변경 함수
+        function updateButtons() {
+            // 버튼 요소들 선택
+            var buttons = document.querySelectorAll(".power")
+            buttons.forEach(function(button) {
+            var textValue = button.getAttribute("data-text");
+            if (textValue === "running") {
+                button.style.backgroundColor = "red";
+                button.textContent = "off";
+            } else {
+                button.style.backgroundColor = "green";
+                button.textContent = "on";
+            }
+            });
+        }
+
+
+
+        // buttons.forEach(function(button) {
+        //     button.addEventListener("click", function() {
+        //         var textValue = button.textContent;
+        //         updateButton(textValue, button);
+        //     });
+        // });
+        
+        // 페이지 로드 시 버튼 스타일 및 내용 변경
+        window.addEventListener("load", function() {
+            updateButtons();
+        });
+    </script>
 </html>
 
