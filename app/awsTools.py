@@ -1,4 +1,5 @@
 import boto3
+import time
 
 #인스턴스 정보 조회
 def getInstance():
@@ -23,7 +24,6 @@ def getInstance():
                 'InstanceVPC': instance.get('VpcId')
             }
             instances.append(instance_info)
-
     return instances
 
 #VPC ID와 VPC NAME 맵핑을 위한 데이터 추출
