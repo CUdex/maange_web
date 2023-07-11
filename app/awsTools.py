@@ -1,5 +1,4 @@
 import boto3
-import time
 
 #인스턴스 정보 조회
 def getInstance():
