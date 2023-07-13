@@ -73,12 +73,12 @@
                     {% for instance in value %}
                         <div class="list_detail">
                             <h4>{{ instance.InstanceName }}</h4>
-                            <p>{{ instance.State }}</p>
+                            <p class="instance_state">{{ instance.State }}</p>
                             <p class="instance_id">ID: {{ instance.InstanceID }}</p>
-                            <p>Type: {{ instance.InstanceType }}</p>
-                            <p>Private IP: {{ instance.PrivateIP }}</p>
-                            <p>Public IP: {{ instance.PublicIP }}</p>
-                            <button class="power" onclick="operPowerAction()" data-text="{{ instance.State }}" instance-id="{{ instance.InstanceID }}"></button>
+                            <p class="instance_type">Type: {{ instance.InstanceType }}</p>
+                            <p class="instance_private">Private IP: {{ instance.PrivateIP }}</p>
+                            <p class="instance_public">Public IP: {{ instance.PublicIP }}</p>
+                            <button class="power" data-text="{{ instance.State }}" instance-id="{{ instance.InstanceID }}"></button>
                         </div>
                     {% endfor %}
                 </div>
@@ -107,7 +107,7 @@
                 (async () => {
                     await updateData(); // 이 부분에서 즉시 실행하는 async 함수를 사용합니다.
                 })();
-            }, 5000);
+            }, 10000);
         {% endif %}
 
         //화면에 표시된 데이터 리로드
@@ -124,8 +124,13 @@
 
                     for (const instance of data) {                      
                         if (id == instance.InstanceID) {
-                            console.log(id)
-                            console.log(instance.InstanceID)
+                            dataContainer.querySelector(".instance_type").textContent = `Type: ${instance.InstanceType}`;
+                            dataContainer.querySelector(".instance_state").textContent = instance.State;
+                            dataContainer.querySelector(".instance_private").textContent = `Private IP: ${instance.PrivateIP}`;
+                            dataContainer.querySelector(".instance_public").textContent = `Public IP: ${instance.PublicIP}`;
+                            dataContainer.querySelector("h4").textContent = instance.InstanceName;
+                            dataContainer.querySelector(".power").setAttribute("data-text", instance.State);
+                            updateButtons();
                         }
                     }
                 }
@@ -144,13 +149,15 @@
             if (textValue === "running") {
                 button.style.backgroundColor = "red";
                 button.textContent = "off";
+                button.onclick = operPowerAction;
             } else if (textValue == "stopped"){
                 button.style.backgroundColor = "green";
                 button.textContent = "on";
+                button.onclick = operPowerAction;
             } else {
                 button.style.backgroundColor = "gray";
                 button.onclick = null
-                button.textContent = "disable"
+                button.textContent = "wait"
             }
             });
         }
@@ -208,4 +215,3 @@
         });
     </script>
 </html>
-
