@@ -105,7 +105,7 @@
             // 주기적 페이지 리로드
             setInterval(() => {
                 (async () => {
-                    await updateData(); // 이 부분에서 즉시 실행하는 async 함수를 사용합니다.
+                    await updateData(); // 즉시 실행하는 async 함수를 사용
                 })();
             }, 10000);
         {% endif %}
