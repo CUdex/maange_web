@@ -7,7 +7,7 @@ def readAppInfo() -> dict:
     """
     app_info = {}
     #정규식을 이용하여 필요한 정보만 dictionary array에 저장하기 위해 정규식 설정
-    db_match = re.compile('^db|^limit')
+    db_match = re.compile('^db|^limit|socket')
     server_match = re.compile('^server|ignore')
     f = open('/etc/app.conf')
     readText = f.readlines()

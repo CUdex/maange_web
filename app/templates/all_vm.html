@@ -57,6 +57,41 @@
     border: 1px solid #ddd;
     border-radius: 4px;
   }
+  .circle_container {
+    display: flex;
+    align-items: center;
+  }
+  .circle {
+    width: 20px; 
+    height: 20px; 
+    border-radius: 50%;
+  }
+  .power {
+    margin-left: 10px;
+  }
+  .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+  .tooltip .tooltiptext {
+            visibility: hidden;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+  }
+
+  .tooltip:hover .tooltiptext {
+            visibility: visible;
+  }
 </style>
 
 <body>
@@ -80,7 +115,35 @@
         {% for x in vm_list %}
           <tr>
             {% for value in x %}
+              {% if loop.index == 7 %}
+                {% if value == '0' %}
+                  <td><div class="circle_container">
+                    <div class="circle" style="background-color: red;"></div>
+                    <div class="tooltip">
+                      <button class="power" value_data="{{ value }}">on</button>
+                      <span class="tooltiptext">{{ x[0] }} On</span>
+                    </div>
+                    <div class="tooltip">
+                      <button class="power" value_data="{{ value }}">off</button>
+                      <span class="tooltiptext">{{ x[0] }} Off</span>
+                    </div>
+                  </div></td>
+                {% else %}
+                  <td><div class="circle_container">
+                    <div class="circle" style="background-color: green;"></div>
+                    <div class="tooltip">
+                      <button class="power" value_data="{{ value }}">on</button>
+                      <span class="tooltiptext">{{ x[0] }} On</span>
+                    </div>
+                    <div class="tooltip">
+                      <button class="power" value_data="{{ value }}">off</button>
+                      <span class="tooltiptext">{{ x[0] }} Off</span>
+                    </div>
+                  </div></td>
+                {% endif %}
+              {% else %}
                 <td>{{ value }}</td>
+              {% endif %}
             {% endfor %}
           </tr>
         {% endfor %}
@@ -88,4 +151,6 @@
     </table>
 </div>
 </body>
+<script>
+</script>
 </html>
