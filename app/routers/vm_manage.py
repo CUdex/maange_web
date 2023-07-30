@@ -1,19 +1,19 @@
 from fastapi import Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse
 import mysql.connector
 import tools
 from fastapi.templating import Jinja2Templates
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from fastapi import APIRouter
+import models
 
 router = APIRouter(prefix='/vm_list')
 
 #jinja templates
 templates = Jinja2Templates(directory="templates")
 
-@router.get("", response_class=HTMLResponse)
-async def search_vm(request: Request, vm_name: str = ""):
+def db_query(query, function_name = 'etc'):
     db_info = tools.readAppInfo()
     # MySQL 연결 설정
     mydb = mysql.connector.connect(
@@ -25,17 +25,35 @@ async def search_vm(request: Request, vm_name: str = ""):
 
     # 쿼리 실행
     mycursor = mydb.cursor()
+    mycursor.execute(query)
+    
+    if function_name == 'search_vm':
+        excute_result = {}
+        excute_result['column_names'] = [col[0] for col in mycursor.description]
+        excute_result['rows'] = mycursor.fetchall()
+    else :
+        excute_result = mycursor.fetchall()
+
+    # MySQL 연결 종료
+    mycursor.close()
+    mydb.close()
+
+    return excute_result
+
+@router.get("", response_class=HTMLResponse)
+async def search_vm(request: Request, vm_name: str = ""):
+    db_info = tools.readAppInfo()
+    
     if not vm_name == "":
-        mycursor.execute("SELECT * FROM vm_list where vm_name like \'%" + vm_name + "%\'")
+        query_result = db_query("SELECT * FROM vm_list where vm_name like \'%" + vm_name + "%\'", 'search_vm')
     else:
-        mycursor.execute("SELECT * FROM vm_list")
+        query_result = db_query("SELECT * FROM vm_list", 'search_vm')
 
     # 쿼리 결과 출력
-    title = []
+    title = query_result['column_names']
+    
     vm_list = []
-    for x in mycursor.description:
-        title.append(str(x[0]))
-    for x in mycursor:
+    for x in query_result['rows']:
         individual_vm = []
         for i, value in enumerate(x):
             if i == 0:
@@ -48,30 +66,16 @@ async def search_vm(request: Request, vm_name: str = ""):
                 individual_vm.append(str(value))
         vm_list.append(individual_vm)
 
-    # MySQL 연결 종료
-    mycursor.close()
-    mydb.close()
-
     return templates.TemplateResponse("all_vm.html", {"request": request, "title": title, "vm_list": vm_list})
 
 @router.get("/server_status", response_class=HTMLResponse)
 async def server_status(request: Request):
-    db_info = tools.readAppInfo()
-    # MySQL 연결 설정
-    mydb = mysql.connector.connect(
-      host=db_info['db_host'],
-      user=db_info['db_user'],
-      password=db_info['db_passwd'],
-      database=db_info['db_database']
-    )
 
-    # 쿼리 실행
-    mycursor = mydb.cursor()
-    mycursor.execute("SELECT * FROM vm_server")
+    server_status = db_query('SELECT * FROM vm_server')
 
     #데이터 조회
     server_list = {}
-    for x in mycursor:
+    for x in server_status:
         server_ip = ""
         individual_server = []
         for i, value in enumerate(x):
@@ -95,3 +99,30 @@ async def server_status(request: Request):
 
     # 템플릿 렌더링
     return templates.TemplateResponse("server_status.html", {"request": request, "dashboard": fig.to_html(full_html=False)})
+
+@router.put("/on_off", response_class=PlainTextResponse)
+async def on_off_vm(body: models.VmOperBody):
+    
+    if not bool(body):
+        return 'fail oper because empty property'
+    
+    # vm 전원 명령에 필요한 변수
+    vm_id = body.vm_id
+    vm_host = body.vm_host
+    oper = body.oper
+    
+    # socket 정보를 app.conf 파일에서 read
+    info_socket = tools.readAppInfo()
+    vm_pass = info_socket['server_pass']
+    socket_server = info_socket['socket_server']
+
+    send_oper_result = await tools.send_socket_message(vm_id, vm_host, oper, vm_pass, socket_server)
+
+    return send_oper_result
+
+@router.get("/check_power")
+def check_vm_powered(vm_id: str, vm_host: str):
+
+    vm_power_status = db_query(f"select vm_powered, vm_boot_time from vm_list where vm_host_server = '{vm_host}' and vm_idx = '{vm_id}'")
+
+    return {'powered': vm_power_status[0][0], 'boot_time': vm_power_status[0][1]}
