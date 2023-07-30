@@ -13,7 +13,7 @@ app.include_router(aws_manage.router)
 templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
+def read_root(request: Request):
     return templates.TemplateResponse("main.html", {"request": request})
 
 if __name__=='__main__':

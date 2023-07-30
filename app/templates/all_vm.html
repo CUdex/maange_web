@@ -57,6 +57,78 @@
     border: 1px solid #ddd;
     border-radius: 4px;
   }
+  .circle_container {
+    display: flex;
+    align-items: center;
+  }
+  .circle {
+    width: 20px; 
+    height: 20px; 
+    border-radius: 50%;
+  }
+  .power {
+    margin-left: 10px;
+  }
+  .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+  }
+  /* 애니메이션 효과 설정 */
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .spin-animation {
+    animation: spin 2s infinite linear;
+  }
+    /* 로딩 애니메이션 스타일 설정 */
+  .loading-container {
+    display: none;
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+  }
+  .loader {
+    border: 4px solid gray;
+    border-top: 4px solid blue;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    animation: spin 2s linear infinite;
+  }
+  /* 숨길 클래스 스타일 설정 */
+  .hide-on-loading {
+      display: block; 
+  }
+  /* 숨김 상태로 변경할 클래스 스타일 설정 */
+  .hide {
+      display: none;
+  }
 </style>
 
 <body>
@@ -80,7 +152,41 @@
         {% for x in vm_list %}
           <tr>
             {% for value in x %}
+              {% if loop.index == 7 %}
+                <td><div class="circle_container" power_data="{{ value }}" vm_name="{{ x[0] }}" vm_id="{{ x[1] }}" vm_host="{{ x[7] }}">
+                {% if value == '0' %}  
+                    <div class="circle" style="background-color: red;"></div>
+                    <div class="tooltip">
+                      <button class="power">on</button>
+                      <span class="tooltiptext">{{ x[0] }} On</span>
+                    </div>
+                    <div class="tooltip">
+                      <button class="power">off</button>
+                      <span class="tooltiptext">{{ x[0] }} Off</span>
+                    </div>
+                    <div class="loading-container">
+                      <div class="loader"></div>
+                    </div>
+                {% else %}
+                    <div class="circle" style="background-color: green;"></div>
+                    <div class="tooltip">
+                      <button class="power">on</button>
+                      <span class="tooltiptext">{{ x[0] }} On</span>
+                    </div>
+                    <div class="tooltip">
+                      <button class="power">off</button>
+                      <span class="tooltiptext">{{ x[0] }} Off</span>
+                    </div>  
+                    <div class="loading-container">
+                      <div class="loader"></div>
+                    </div>
+                {% endif %}
+                </div></td>
+              {% elif loop.index == 6 %}
+                <td class="boot_time">{{ value }}</td>
+              {% else %}
                 <td>{{ value }}</td>
+              {% endif %}
             {% endfor %}
           </tr>
         {% endfor %}
@@ -88,4 +194,121 @@
     </table>
 </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  async function onOffClickButton() {
+    const button = event.target;
+    const container_div = button.closest(".circle_container");
+    const vm_name = container_div.getAttribute("vm_name");
+    const vm_id = container_div.getAttribute("vm_id");
+    const vm_host = container_div.getAttribute("vm_host");
+    const vm_power = container_div.getAttribute("power_data");
+    const button_text = button.innerText;
+    const button_power_number = (button_text === 'on') ? '1' : '0';
+    
+    // status가 버튼과 동일할 경우 동작 무시하기 위한 로직
+    const power_led = container_div.querySelector(".circle")
+    const led_number = (power_led.style.backgroundColor === 'green') ? '1' : '0';
+
+    if(button_power_number === led_number) {
+      alert(`이미 ${button_text} 동작 중입니다.`)
+      return;
+    }
+
+    // on off 동작
+    const confirmed = confirm(`${vm_name}을 ${button_text} 하시겠습니까??`)
+
+    if(confirmed) {
+      // div 안의 모든 태그 숨기기
+      const children = container_div.children;
+      for (let i = 0; i < children.length; i++) {
+          children[i].style.display = "none";
+      }
+
+      const loadingContainer = container_div.querySelector(".loading-container");
+      loadingContainer.style.display = "flex";
+
+      send_result = await powerActionButtonClick(button_text, vm_id, vm_host);
+
+      if (send_result) {
+        check_power_value = await checkVmPowered(vm_id, vm_host);
+        
+        //power 상태에 따른 led 색 변경
+        if(check_power_value.powered === 1) {
+          power_led.style.backgroundColor = 'green';
+        } else {
+          power_led.style.backgroundColor = 'red';
+        }
+
+        // off 시 boot time 0으로 표기하기 위한 element get, 값 변경
+        const parent_tr = button.closest("tr");
+        const boot_time = parent_tr.querySelector(".boot_time");
+        boot_time.innerText = check_power_value.boot_time;
+
+      } 
+
+      // div 안의 모든 태그 다시 표시하기
+      for (let i = 0; i < children.length; i++) {
+          children[i].style.display = "block";
+      }
+      // 로딩 중인 상태 표시 숨기기
+      loadingContainer.style.display = "none";
+    }
+  }
+
+  // 개별 power status 결과 요청
+  async function checkVmPowered(vm_id, vm_host) {
+    const params = {
+      vm_id: vm_id,
+      vm_host: vm_host
+    };
+
+    try {
+      const response = await axios
+      .get("/vm_list/check_power", {params});
+
+      return response.data;
+    } catch {
+      alert("get method error");
+    }
+  }
+
+  //put 요청
+  async function powerActionButtonClick(oper, vm_id, vm_host) {
+      // put 요청을 보낼 데이터
+      var data = {
+          oper: oper,
+          vm_id: vm_id,
+          vm_host: vm_host
+      };
+
+      try {
+        // put 요청 보내기
+        const response = await axios
+        .put("/vm_list/on_off", data, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        if (response.status === 200) {
+              const regex = /^success/;
+              message = response.data;
+              alert(message);
+              if(regex.test(message)) {
+                return true;
+              } else {
+                return false;
+              }
+        }
+      } catch {
+        alert("put method error");
+      }
+  }
+
+  // 모든 버튼 요소를 선택하여 클릭 이벤트에 onClickButton 함수 연결
+  const buttons = document.querySelectorAll(".power");
+  buttons.forEach(button => {
+    button.addEventListener("click", onOffClickButton);
+  });
+</script>
 </html>
