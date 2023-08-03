@@ -129,17 +129,25 @@
   .hide {
       display: none;
   }
+  .name:hover {
+    color: orange;
+    cursor: pointer;
+  }
 </style>
 
 <body>
   {% include "main_header.html" %}
 <div id="container">
   <div>
+    <div>
+      <button onclick="go_sheet()">VM 리스트 시트 이동</button>
+      <button id="getVMRC">vmrc 설치</button>
+    </div>
     <form method="get" id="search_form">
       <input type="string" name="vm_name"/>
       <input type="submit" value="검색">
     </form>
-  </div> 
+  </div>
   <table class='styled-table'>
       <thead>
         <tr>
@@ -182,6 +190,13 @@
                     </div>
                 {% endif %}
                 </div></td>
+              {% elif loop.index == 1 %}
+                <td>
+                  <div class="tooltip">
+                    <div class="name">{{ value }}</div>
+                    <span class="tooltiptext">콘솔 연결</span>
+                  </div>
+                </td>
               {% elif loop.index == 6 %}
                 <td class="boot_time">{{ value }}</td>
               {% else %}
@@ -305,10 +320,88 @@
       }
   }
 
+
+
   // 모든 버튼 요소를 선택하여 클릭 이벤트에 onClickButton 함수 연결
   const buttons = document.querySelectorAll(".power");
   buttons.forEach(button => {
     button.addEventListener("click", onOffClickButton);
   });
+
+
+</script>
+<!-- <link rel="stylesheet" type="text/css" href="vm_list/css/wmks-all.css" /> -->
+ <!-- <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script> -->
+ <!-- <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script> -->
+ <!-- <script src="vm_list/wmks.min.js"></script> -->
+
+<script>
+
+  function hrVm() {
+    var target = event.target;
+    target = target.closest("tr");
+    target = target.querySelector(".circle_container");
+
+    const target_id = target.getAttribute("vm_id");
+    const target_host = target.getAttribute("vm_host");
+
+
+    vmrc_ex(target_host, target_id);
+  }  
+
+ function vmrc_ex(vm_host, vm_id) {
+        // 인증서 문제로 wss 연결 불가 ㅜ
+        // var wmks = WMKS.createWMKS("wmksContainer",{})
+        
+        // wmks.register(WMKS.CONST.Events.CONNECTION_STATE_CHANGE, function(event,data){
+        //   if(data.state == WMKS.CONST.ConnectionState.CONNECTED){
+        //     console.log("connection state change : connected");}
+        // });
+
+        // wmks.register(WMKS.CONST.Events.WMKS_KEYDOWN, function(event, data) {
+        //   console.log("Key pressed:", data.keyCode);
+        // });
+        // wmks.connect("ws://172.29.100.203:443/ticket/ab1684ba2d018d37"); 
+        // WMRC
+        window.location.href = "vmrc://" + vm_host + "/?moid=" + vm_id;
+  }  
+  
+  const vm_name_text = document.querySelectorAll(".name");
+  vm_name_text.forEach(name_text => {
+    name_text.addEventListener("click", hrVm);
+  });
+
+
+  function getVmrcExe() {
+    try {
+      axios
+      .get("/vm_list/vmrc", { responseType: "blob"})
+      .then(response => {
+          const fileName = "vmrc.exe";
+
+          // 파일을 다운로드합니다.
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', fileName);
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch(error => {
+          console.error("Error downloading the file:", error);
+        });
+    } catch {
+      alert("get method error");
+    }
+  }
+
+  const get_vmrc_button = document.querySelector("#getVMRC")
+  get_vmrc_button.addEventListener("click", getVmrcExe)
+
+  function go_sheet() {
+    const url = "https://docs.google.com/spreadsheets/d/1lAyzBUvUKutQOAnqBrEnQVSajWQIh1dcR5-y6s-scfk/edit#gid=0"
+    window.open(url, '_blank');
+  }
+
 </script>
 </html>
