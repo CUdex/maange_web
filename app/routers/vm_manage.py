@@ -1,5 +1,5 @@
 from fastapi import Request
-from fastapi.responses import HTMLResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, FileResponse
 import mysql.connector
 import tools
 from fastapi.templating import Jinja2Templates
@@ -126,3 +126,16 @@ def check_vm_powered(vm_id: str, vm_host: str):
     vm_power_status = db_query(f"select vm_powered, vm_boot_time from vm_list where vm_host_server = '{vm_host}' and vm_idx = '{vm_id}'")
 
     return {'powered': vm_power_status[0][0], 'boot_time': vm_power_status[0][1]}
+
+@router.get("/vmrc", response_class=FileResponse)
+async def get_vmrc_file():
+
+    exe_file_path = './asset/VMware-VMRC-12.0.4-21740317.exe'
+
+    return FileResponse(exe_file_path, filename='vmrc.exe')
+
+@router.get("/asset/{image_name}", response_class=FileResponse)
+async def get_image_file(image_name: str):
+    image_file_path = f'./asset/{image_name}'
+
+    return FileResponse(image_file_path, media_type = 'img/png')
