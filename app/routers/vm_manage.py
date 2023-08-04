@@ -128,8 +128,14 @@ def check_vm_powered(vm_id: str, vm_host: str):
     return {'powered': vm_power_status[0][0], 'boot_time': vm_power_status[0][1]}
 
 @router.get("/vmrc", response_class=FileResponse)
-async def get_css_file():
+async def get_vmrc_file():
 
-    js_file_path = './asset/VMware-VMRC-12.0.4-21740317.exe'
+    exe_file_path = './asset/VMware-VMRC-12.0.4-21740317.exe'
 
-    return FileResponse(js_file_path, filename='vmrc.exe')
+    return FileResponse(exe_file_path, filename='vmrc.exe')
+
+@router.get("/asset/{image_name}", response_class=FileResponse)
+async def get_image_file(image_name: str):
+    image_file_path = f'./asset/{image_name}'
+
+    return FileResponse(image_file_path, media_type = 'img/png')

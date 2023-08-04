@@ -13,7 +13,6 @@
   }
   .styled-table {
       border-collapse: collapse;
-      margin: auto;
       font-size: 0.9em;
       font-family: sans-serif;
       min-width: 1100px;
@@ -47,23 +46,24 @@
       text-align: center;
   }
   #search_form {
-    position: relative;
-    top: 0;
-    right: 0;
-    left: 400px;
-    margin: 20px;
-    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    margin-left: 630px;
+    margin-bottom: 10px;
+    padding: 10px;
     background-color: #f2f2f2;
     border: 1px solid #ddd;
     border-radius: 4px;
+    align-items: center; 
   }
   .circle_container {
     display: flex;
     align-items: center;
   }
   .circle {
-    width: 20px; 
-    height: 20px; 
+    width: 15px; 
+    height: 15px; 
     border-radius: 50%;
   }
   .power {
@@ -133,80 +133,107 @@
     color: orange;
     cursor: pointer;
   }
+  img {
+    width: 20px;
+    height: 20px;
+  }
+  #tools {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-top: 50px;
+    padding: 0;
+    min-width: 1100px;
+  }
+  #tools .tools_text {
+    padding: 0;
+    margin: 0;
+  }
+  #tools .tools_text:hover {
+    cursor: pointer;
+    color: green;
+  }
 </style>
-
 <body>
   {% include "main_header.html" %}
+<div></div>
 <div id="container">
-  <div>
-    <div>
-      <button onclick="go_sheet()">VM 리스트 시트 이동</button>
-      <button id="getVMRC">vmrc 설치</button>
-    </div>
-    <form method="get" id="search_form">
-      <input type="string" name="vm_name"/>
-      <input type="submit" value="검색">
-    </form>
-  </div>
   <table class='styled-table'>
-      <thead>
+      <div id="tools">
+        <div onclick="go_sheet()" class="tools_text">
+          <img src="vm_list/asset/Google_Sheets_Logo.png">
+          vm 현황판
+        </div>
+        <div id="getVMRC" class="tools_text">
+          <img src="vm_list/asset/vmrc_logo.png">
+          vmrc 설치
+        </div>
+      <div id="search_form">
+        <form method="get">
+          <input type="string" name="vm_name"/>
+          <input type="submit" value="검색">
+        </form>
+      </div>
+    </div>
+    <thead>
+      <tr>
+        {% for x in title %}
+          <th>{{ x }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for x in vm_list %}
         <tr>
-          {% for x in title %}
-            <th>{{ x }}</th>
+          {% for value in x %}
+            {% if loop.index == 7 %}
+              <td><div class="circle_container" power_data="{{ value }}" vm_name="{{ x[0] }}" vm_id="{{ x[1] }}" vm_host="{{ x[7] }}">
+              {% if value == '0' %}  
+                  <div class="circle" style="background-color: red;"></div>
+                  <div class="tooltip">
+                    <button class="power">on</button>
+                    <span class="tooltiptext">{{ x[0] }} On</span>
+                  </div>
+                  <div class="tooltip">
+                    <button class="power">off</button>
+                    <span class="tooltiptext">{{ x[0] }} Off</span>
+                  </div>
+                  <div class="loading-container">
+                    <div class="loader"></div>
+                  </div>
+              {% else %}
+                  <div class="circle" style="background-color: green;"></div>
+                  <div class="tooltip">
+                    <button class="power">on</button>
+                    <span class="tooltiptext">{{ x[0] }} On</span>
+                  </div>
+                  <div class="tooltip">
+                    <button class="power">off</button>
+                    <span class="tooltiptext">{{ x[0] }} Off</span>
+                  </div>  
+                  <div class="loading-container">
+                    <div class="loader"></div>
+                  </div>
+              {% endif %}
+              </div></td>
+            {% elif loop.index == 1 %}
+              <td>
+                <div class="tooltip">
+                  <div class="name">{{ value }}</div>
+                  <span class="tooltiptext">콘솔 연결</span>
+                </div>
+              </td>
+            {% elif loop.index == 6 %}
+              <td class="boot_time">{{ value }}</td>
+            {% else %}
+              <td>{{ value }}</td>
+            {% endif %}
           {% endfor %}
         </tr>
-      </thead>
-      <tbody>
-        {% for x in vm_list %}
-          <tr>
-            {% for value in x %}
-              {% if loop.index == 7 %}
-                <td><div class="circle_container" power_data="{{ value }}" vm_name="{{ x[0] }}" vm_id="{{ x[1] }}" vm_host="{{ x[7] }}">
-                {% if value == '0' %}  
-                    <div class="circle" style="background-color: red;"></div>
-                    <div class="tooltip">
-                      <button class="power">on</button>
-                      <span class="tooltiptext">{{ x[0] }} On</span>
-                    </div>
-                    <div class="tooltip">
-                      <button class="power">off</button>
-                      <span class="tooltiptext">{{ x[0] }} Off</span>
-                    </div>
-                    <div class="loading-container">
-                      <div class="loader"></div>
-                    </div>
-                {% else %}
-                    <div class="circle" style="background-color: green;"></div>
-                    <div class="tooltip">
-                      <button class="power">on</button>
-                      <span class="tooltiptext">{{ x[0] }} On</span>
-                    </div>
-                    <div class="tooltip">
-                      <button class="power">off</button>
-                      <span class="tooltiptext">{{ x[0] }} Off</span>
-                    </div>  
-                    <div class="loading-container">
-                      <div class="loader"></div>
-                    </div>
-                {% endif %}
-                </div></td>
-              {% elif loop.index == 1 %}
-                <td>
-                  <div class="tooltip">
-                    <div class="name">{{ value }}</div>
-                    <span class="tooltiptext">콘솔 연결</span>
-                  </div>
-                </td>
-              {% elif loop.index == 6 %}
-                <td class="boot_time">{{ value }}</td>
-              {% else %}
-                <td>{{ value }}</td>
-              {% endif %}
-            {% endfor %}
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -320,14 +347,11 @@
       }
   }
 
-
-
   // 모든 버튼 요소를 선택하여 클릭 이벤트에 onClickButton 함수 연결
   const buttons = document.querySelectorAll(".power");
   buttons.forEach(button => {
     button.addEventListener("click", onOffClickButton);
   });
-
 
 </script>
 <!-- <link rel="stylesheet" type="text/css" href="vm_list/css/wmks-all.css" /> -->
@@ -344,33 +368,34 @@
 
     const target_id = target.getAttribute("vm_id");
     const target_host = target.getAttribute("vm_host");
+    const target_name = target.getAttribute("vm_name");
 
-
-    vmrc_ex(target_host, target_id);
+    const confirmed = confirm(`${target_name}에 콘솔을 연결합니다.\n\nvmrc가 설치되어 있지 않을 경우 연결이 실행되지 않습니다.\n좌측 상단의 \"vmrc 설치\"를 눌러 vmrc를 설치해주세요.`)
+    if (confirmed) {
+      window.location.href = "vmrc://" + target_host + "/?moid=" + target_id;
+    }
   }  
 
- function vmrc_ex(vm_host, vm_id) {
-        // 인증서 문제로 wss 연결 불가 ㅜ
-        // var wmks = WMKS.createWMKS("wmksContainer",{})
+//  function vmrc_ex(vm_host, vm_id) {
+//         // 인증서 문제로 wss 연결 불가 ㅜ
+//         // var wmks = WMKS.createWMKS("wmksContainer",{})
         
-        // wmks.register(WMKS.CONST.Events.CONNECTION_STATE_CHANGE, function(event,data){
-        //   if(data.state == WMKS.CONST.ConnectionState.CONNECTED){
-        //     console.log("connection state change : connected");}
-        // });
+//         // wmks.register(WMKS.CONST.Events.CONNECTION_STATE_CHANGE, function(event,data){
+//         //   if(data.state == WMKS.CONST.ConnectionState.CONNECTED){
+//         //     console.log("connection state change : connected");}
+//         // });
 
-        // wmks.register(WMKS.CONST.Events.WMKS_KEYDOWN, function(event, data) {
-        //   console.log("Key pressed:", data.keyCode);
-        // });
-        // wmks.connect("ws://172.29.100.203:443/ticket/ab1684ba2d018d37"); 
-        // WMRC
-        window.location.href = "vmrc://" + vm_host + "/?moid=" + vm_id;
-  }  
+//         // wmks.register(WMKS.CONST.Events.WMKS_KEYDOWN, function(event, data) {
+//         //   console.log("Key pressed:", data.keyCode);
+//         // });
+//         // wmks.connect("ws://172.29.100.203:443/ticket/ab1684ba2d018d37"); 
+//         // WMRC
+//   }  
   
   const vm_name_text = document.querySelectorAll(".name");
   vm_name_text.forEach(name_text => {
     name_text.addEventListener("click", hrVm);
   });
-
 
   function getVmrcExe() {
     try {
@@ -402,6 +427,5 @@
     const url = "https://docs.google.com/spreadsheets/d/1lAyzBUvUKutQOAnqBrEnQVSajWQIh1dcR5-y6s-scfk/edit#gid=0"
     window.open(url, '_blank');
   }
-
 </script>
 </html>
