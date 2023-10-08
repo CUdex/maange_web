@@ -71,34 +71,35 @@ async def search_vm(request: Request, vm_name: str = ""):
 @router.get("/server_status", response_class=HTMLResponse)
 async def server_status(request: Request):
 
-    server_status = db_query('SELECT * FROM vm_server')
+    # grafana로 dashborad 변경
+    # server_status = db_query('SELECT * FROM vm_server')
 
-    #데이터 조회
-    server_list = {}
-    for x in server_status:
-        server_ip = ""
-        individual_server = []
-        for i, value in enumerate(x):
-            if i == 0:
-                server_ip = str(value)
-            else:
-                individual_server.append(int(value))
-        server_list[server_ip] = individual_server 
+    # #데이터 조회
+    # server_list = {}
+    # for x in server_status:
+    #     server_ip = ""
+    #     individual_server = []
+    #     for i, value in enumerate(x):
+    #         if i == 0:
+    #             server_ip = str(value)
+    #         else:
+    #             individual_server.append(int(value))
+    #     server_list[server_ip] = individual_server 
 
-    # x축 데이터 생성
-    x = ["cpu", "memory", "disk"]
+    # # x축 데이터 생성
+    # x = ["cpu", "memory", "disk"]
 
-    # 플로팅 대시보드 생성
-    fig = make_subplots(rows=1, cols=2, subplot_titles=("200 server", "203 server"))
-    fig.add_trace(go.Bar(x=x, y=server_list['172.29.100.200'], name='first_server'), row=1, col=1)
-    fig.add_trace(go.Bar(x=x, y=server_list['172.29.100.203'], name='second_server'), row=1, col=2)
+    # # 플로팅 대시보드 생성
+    # fig = make_subplots(rows=1, cols=2, subplot_titles=("200 server", "203 server"))
+    # fig.add_trace(go.Bar(x=x, y=server_list['172.29.100.200'], name='first_server'), row=1, col=1)
+    # fig.add_trace(go.Bar(x=x, y=server_list['172.29.100.203'], name='second_server'), row=1, col=2)
     
-    # 레이아웃 설정
-    fig.update_layout(title='Server Status')
-    fig.update_yaxes(range=[0, 100])
+    # # 레이아웃 설정
+    # fig.update_layout(title='Server Status')
+    # fig.update_yaxes(range=[0, 100])
 
     # 템플릿 렌더링
-    return templates.TemplateResponse("server_status.html", {"request": request, "dashboard": fig.to_html(full_html=False)})
+    return templates.TemplateResponse("server_status.html")
 
 @router.put("/on_off", response_class=PlainTextResponse)
 async def on_off_vm(body: models.VmOperBody):
