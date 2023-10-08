@@ -99,7 +99,7 @@ async def server_status(request: Request):
     # fig.update_yaxes(range=[0, 100])
 
     # 템플릿 렌더링
-    return templates.TemplateResponse("server_status.html")
+    return templates.TemplateResponse("server_status.html", {"request": request})
 
 @router.put("/on_off", response_class=PlainTextResponse)
 async def on_off_vm(body: models.VmOperBody):
