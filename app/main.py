@@ -4,11 +4,13 @@ from fastapi.templating import Jinja2Templates
 import uvicorn
 from routers import vm_manage
 from routers import aws_manage
+from routers import test_curl
 
 # fastapi 객체 생성
 app = FastAPI()
 app.include_router(vm_manage.router)
 app.include_router(aws_manage.router)
+app.include_router(test_curl.router)
 #jinja templates
 templates = Jinja2Templates(directory="templates")
 

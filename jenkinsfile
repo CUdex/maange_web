@@ -24,6 +24,22 @@ pipeline {
       }
     }
 
+    stage("container image test") {
+      steps {
+        script {
+          echo test
+        }
+      }
+    }
+
+    stage("container image vulnerability check") {
+      steps {
+        script {
+          sh "/bin/bash /home/user/Vulnerability_check.sh ${WEB_VERSION}"
+        }
+      }
+    }
+
     stage("Push Docker Image to Docker Hub") {
       steps {
         script {
