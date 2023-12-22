@@ -12,9 +12,9 @@ async def return_version():
     version = version.split('=')
 
     host_name = os.environ.get('HOSTNAME')
-    result = f"""
-    container name: {host_name}
-    container version: {version[1]}
-    """
+    result = f"""-----------------------------------------------
+container name: {host_name}
+container version: {version[1]}
+-----------------------------------------------"""
     
     return result
