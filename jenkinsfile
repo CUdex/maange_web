@@ -27,7 +27,7 @@ pipeline {
     stage("container image test") {
       steps {
         script {
-          echo test
+          sh "echo test"
         }
       }
     }
