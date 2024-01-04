@@ -26,6 +26,13 @@
             height: 300px;
             border: 1px solid;
             margin-bottom: 5px;
+            overflow: auto; 
+        }
+        .list_detail h4 {
+            /* 텍스트가 너무 길면 '...'로 줄임 표시 */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .list_detail:hover {
             transform: translateY(-5px);

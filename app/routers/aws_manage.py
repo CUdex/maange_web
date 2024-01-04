@@ -14,6 +14,10 @@ templates = Jinja2Templates(directory="templates")
 async def cloud_list(request: Request):
     return templates.TemplateResponse("cloud_status.html", {"request": request})
 
+@router.get("/new", response_class=HTMLResponse)
+async def cloud_list(request: Request):
+    return templates.TemplateResponse("new_status.html", {"request": request})
+
 @router.get("/instance")
 async def cloud_list(request: Request, question: bool = False):
     

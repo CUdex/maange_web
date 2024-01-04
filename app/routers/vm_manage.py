@@ -3,8 +3,8 @@ from fastapi.responses import HTMLResponse, PlainTextResponse, FileResponse
 import mysql.connector
 import tools
 from fastapi.templating import Jinja2Templates
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+#import plotly.graph_objects as go
+#from plotly.subplots import make_subplots
 from fastapi import APIRouter
 import models
 
