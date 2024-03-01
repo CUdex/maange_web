@@ -1,9 +1,8 @@
 import boto3
 
+ec2 = boto3.client('ec2')
 #인스턴스 정보 조회
 def getInstance():
-
-    ec2 = boto3.client('ec2')
 
     # 인스턴스 목록 조회
     response = ec2.describe_instances()
@@ -20,7 +19,9 @@ def getInstance():
                 'InstanceName': next((tag['Value'] for tag in instance.get('Tags', []) if tag['Key'] == 'Name'), 'empty'),
                 'PrivateIP': instance.get('PrivateIpAddress'),
                 'PublicIP': instance.get('PublicIpAddress', 'No Public'),
-                'InstanceVPC': instance.get('VpcId')
+                'InstanceVPC': instance.get('VpcId'),
+                'no_auto_stop': next((tag['Value'] for tag in instance.get('Tags', []) if tag['Key'] == 'NO_AUTO_STOP'), 'disable'),
+                'no_auto_terminate': next((tag['Value'] for tag in instance.get('Tags', []) if tag['Key'] == 'NO_AUTO_TERMINATE'), 'disable')
             }
             instances.append(instance_info)
     return instances
@@ -28,7 +29,6 @@ def getInstance():
 #VPC ID와 VPC NAME 맵핑을 위한 데이터 추출
 def getVpc():
     vpcs = {}
-    ec2 = boto3.client('ec2')
 
     response = ec2.describe_vpcs()
 
@@ -38,10 +38,19 @@ def getVpc():
     return vpcs
 
 def stopInstance(instance_id):
-    ec2 = boto3.client('ec2')
     ec2.stop_instances(InstanceIds=[instance_id])
 
 
 def startInstance(instance_id):
-    ec2 = boto3.client('ec2')
     ec2.start_instances(InstanceIds=[instance_id])
+
+def updateTag(instance_id, tag_key, value):
+    # 태그 업데이트
+    response = ec2.create_tags(
+        Resources=[instance_id],
+        Tags=[{
+            'Key': tag_key,
+            'Value': value
+        }]
+    )
+    return response

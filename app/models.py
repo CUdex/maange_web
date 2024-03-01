@@ -11,3 +11,8 @@ class VmOperBody(BaseModel):
 
     def __bool__(self):
         return bool(self.oper and self.vm_host and self.vm_id)
+
+class TagChangeData(BaseModel):
+    instance_id: str
+    tag_key: str
+    state: str

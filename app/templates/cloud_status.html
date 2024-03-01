@@ -2,6 +2,8 @@
 <html>
     <head>
         <title>All Instance LIST</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('css', path='/switch.css') }}">
+        <script src="{{ url_for('js', path='switch_action.js') }}"></script>
     </head>
     <style>
         .main_title {
@@ -23,7 +25,7 @@
             display: inline-block;
             
             width: 220px;
-            height: 300px;
+            height: auto;
             border: 1px solid;
             margin-bottom: 5px;
             overflow: auto; 
@@ -34,6 +36,10 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        .list_detail p {
+            /* 텍스트가 너무 길면 '...'로 줄임 표시 */
+            margin: 1px;
+        }
         .list_detail:hover {
             transform: translateY(-5px);
         }
@@ -43,6 +49,8 @@
             font-size: 15px;
             width: 100px;
             border: none;
+            margin-top: 10px;
+            margin-bottom: 5px;
             transition: transform 0.3s ease;
         }
         .power:hover {
@@ -84,11 +92,29 @@
                     {% for instance in value %}
                         <div class="list_detail">
                             <h4>{{ instance.InstanceName }}</h4>
-                            <p class="instance_state">{{ instance.State }}</p>
-                            <p class="instance_id">ID: {{ instance.InstanceID }}</p>
+                            <p class="instance_state">State: {{ instance.State }}</p>
+                            <p class="instance_id">Id: {{ instance.InstanceID }}</p>
                             <p class="instance_type">Type: {{ instance.InstanceType }}</p>
                             <p class="instance_private">Private IP: {{ instance.PrivateIP }}</p>
                             <p class="instance_public">Public IP: {{ instance.PublicIP }}</p>
+                            <label>
+                                <span>NO STOP</span>
+                                <input class="stop_tag" onclick=toggleCheckbox() role="switch" type="checkbox" instance-id="{{ instance.InstanceID }}" tag_key="NO_AUTO_STOP" 
+                                {% if instance.no_auto_stop == "enable" %} 
+                                checked value="enable"
+                                {% else %}
+                                value="disable"
+                                {% endif %}/>
+                            </label>
+                            <label>
+                                <span>NO TERMINATE</span>
+                                <input class="terminate_tag" onclick=toggleCheckbox() role="switch" type="checkbox" instance-id="{{ instance.InstanceID }}" tag_key="NO_AUTO_TERMINATE" 
+                                {% if instance.no_auto_terminate == "enable" %} 
+                                checked value="enable"
+                                {% else %}
+                                checked value="disable"
+                                {% endif %}/>
+                            </label><br>
                             <button class="power" data-text="{{ instance.State }}" instance-id="{{ instance.InstanceID }}"></button>
                         </div>
                     {% endfor %}
@@ -141,6 +167,32 @@
                             dataContainer.querySelector(".instance_public").textContent = `Public IP: ${instance.PublicIP}`;
                             dataContainer.querySelector("h4").textContent = instance.InstanceName;
                             dataContainer.querySelector(".power").setAttribute("data-text", instance.State);
+
+                            // checkbox 표시를 위한 attribute 수정
+                            let checkbox = dataContainer.querySelector("input.stop_tag");
+
+                            if (instance.no_auto_stop === "enable") {
+                                checkbox.checked = true;
+                                checkbox.classList.add('checked');
+                                checkbox.setAttribute('value','enable');
+                            } else {
+                                checkbox.checked = false;
+                                checkbox.classList.remove('checked');
+                                checkbox.setAttribute('value','disable');
+                            }
+
+                            checkbox = dataContainer.querySelector("input.terminate_tag");
+
+                            if (instance.no_auto_terminate === "enable") {
+                                checkbox.checked = true;
+                                checkbox.classList.add('checked');
+                                checkbox.setAttribute('value','enable');
+                            } else {
+                                checkbox.checked = false;
+                                checkbox.classList.remove('checked');
+                                checkbox.setAttribute('value','disable');
+                            }
+
                             updateButtons();
                         }
                     }
@@ -148,7 +200,6 @@
             } catch(error) {
                 console.error("GET 요청 실패:", error);
             }
-
         }
 
         // 버튼 스타일 및 내용 변경 함수
