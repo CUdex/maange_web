@@ -78,53 +78,12 @@
             background-color: #000000;
             color: #ffffff ;
         }
+        
+        .status-text {
+            color: gray; /* 기본 텍스트 색상 */
+        }
 
     </style>
-    <body>
-        {% include "main_header.html" %}
-        {% if instance_data %}
-            {% for key, value in instance_data.items() %}
-            <div class="main_list">
-                <div class="main_title">
-                    <p class="fading-text">{{ key }}</p>
-                </div>
-                <div class="list_start">
-                    {% for instance in value %}
-                        <div class="list_detail">
-                            <h4>{{ instance.InstanceName }}</h4>
-                            <p class="instance_state">State: {{ instance.State }}</p>
-                            <p class="instance_id">Id: {{ instance.InstanceID }}</p>
-                            <p class="instance_type">Type: {{ instance.InstanceType }}</p>
-                            <p class="instance_private">Private IP: {{ instance.PrivateIP }}</p>
-                            <p class="instance_public">Public IP: {{ instance.PublicIP }}</p>
-                            <label>
-                                <span>NO STOP</span>
-                                <input class="stop_tag" onclick=toggleCheckbox() role="switch" type="checkbox" instance-id="{{ instance.InstanceID }}" tag_key="NO_AUTO_STOP" 
-                                {% if instance.no_auto_stop == "enable" %} 
-                                checked value="enable"
-                                {% else %}
-                                value="disable"
-                                {% endif %}/>
-                            </label>
-                            <label>
-                                <span>NO TERMINATE</span>
-                                <input class="terminate_tag" onclick=toggleCheckbox() role="switch" type="checkbox" instance-id="{{ instance.InstanceID }}" tag_key="NO_AUTO_TERMINATE" 
-                                {% if instance.no_auto_terminate == "enable" %} 
-                                checked value="enable"
-                                {% else %}
-                                checked value="disable"
-                                {% endif %}/>
-                            </label><br>
-                            <button class="power" data-text="{{ instance.State }}" instance-id="{{ instance.InstanceID }}"></button>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endfor %}
-        {% else %}
-            <p class="wait_text">인스턴스 데이터 로드 중....</p>
-        {% endif %}
-    </body>    
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         async function requestSecondPageAndRedirect() {
@@ -162,11 +121,26 @@
                     for (const instance of data) {                      
                         if (id == instance.InstanceID) {
                             dataContainer.querySelector(".instance_type").textContent = `Type: ${instance.InstanceType}`;
-                            dataContainer.querySelector(".instance_state").textContent = instance.State;
+                            //dataContainer.querySelector(".instance_state").textContent = instance.State;
                             dataContainer.querySelector(".instance_private").textContent = `Private IP: ${instance.PrivateIP}`;
                             dataContainer.querySelector(".instance_public").textContent = `Public IP: ${instance.PublicIP}`;
                             dataContainer.querySelector("h4").textContent = instance.InstanceName;
                             dataContainer.querySelector(".power").setAttribute("data-text", instance.State);
+                            
+                            // state 상태에 따른 표시 색깔 변환
+                            const textElementState = dataContainer.querySelector(".status-text");
+                            textElementState.textContent = instance.State;
+
+                            switch(instance.State) {
+                                case 'running':
+                                    textElementState.style.color = 'green';
+                                    break;
+                                case 'stopped':
+                                    textElementState.style.color = 'red';
+                                    break;
+                                default:
+                                    textElementState.style.color = 'grey';
+                            }
 
                             // checkbox 표시를 위한 attribute 수정
                             let checkbox = dataContainer.querySelector("input.stop_tag");
@@ -193,7 +167,7 @@
                                 checkbox.setAttribute('value','disable');
                             }
 
-                            updateButtons();
+                            updateColors();
                         }
                     }
                 }
@@ -202,12 +176,12 @@
             }
         }
 
-        // 버튼 스타일 및 내용 변경 함수
-        function updateButtons() {
+        // 버튼, 상태 스타일 및 내용 변경 함수
+        function updateColors() {
             // 버튼 요소들 선택
-            var buttons = document.querySelectorAll(".power")
+            const buttons = document.querySelectorAll(".power")
             buttons.forEach(function(button) {
-            var textValue = button.getAttribute("data-text");
+            const textValue = button.getAttribute("data-text");
             if (textValue === "running") {
                 button.style.backgroundColor = "red";
                 button.textContent = "off";
@@ -220,6 +194,19 @@
                 button.style.backgroundColor = "gray";
                 button.onclick = null
                 button.textContent = "wait"
+            }
+            });
+
+            // 상태에 따른 컬러 변경
+            const state = document.querySelectorAll(".status-text")
+            state.forEach(function(state) {
+            const textValue = state.textContent;
+            if (textValue === "running") {
+                state.style.color = "green";
+            } else if (textValue == "stopped"){
+                state.style.color = "red";
+            } else {
+                state.style.color = "gray";
             }
             });
         }
@@ -273,7 +260,52 @@
         
         // 페이지 로드 시 버튼 스타일 및 내용 변경
         window.addEventListener("load", function() {
-            updateButtons();
+            updateColors();
         });
     </script>
+    <body>
+        {% include "main_header.html" %}
+        {% if instance_data %}
+            {% for key, value in instance_data.items() %}
+            <div class="main_list">
+                <div class="main_title">
+                    <p class="fading-text">{{ key }}</p>
+                </div>
+                <div class="list_start">
+                    {% for instance in value %}
+                        <div class="list_detail">
+                            <h4>{{ instance.InstanceName }}</h4>
+                            <p class="instance_state">State: <span class="status-text">{{ instance.State }}</span></p>
+                            <p class="instance_id">Id: {{ instance.InstanceID }}</p>
+                            <p class="instance_type">Type: {{ instance.InstanceType }}</p>
+                            <p class="instance_private">Private IP: {{ instance.PrivateIP }}</p>
+                            <p class="instance_public">Public IP: {{ instance.PublicIP }}</p>
+                            <label>
+                                <span>NO STOP</span>
+                                <input class="stop_tag" onclick=toggleCheckbox() role="switch" type="checkbox" instance-id="{{ instance.InstanceID }}" tag_key="NO_AUTO_STOP" 
+                                {% if instance.no_auto_stop == "enable" %} 
+                                checked value="enable"
+                                {% else %}
+                                value="disable"
+                                {% endif %}/>
+                            </label>
+                            <label>
+                                <span>NO TERMINATE</span>
+                                <input class="terminate_tag" onclick=toggleCheckbox() role="switch" type="checkbox" instance-id="{{ instance.InstanceID }}" tag_key="NO_AUTO_TERMINATE" 
+                                {% if instance.no_auto_terminate == "enable" %} 
+                                checked value="enable"
+                                {% else %}
+                                checked value="disable"
+                                {% endif %}/>
+                            </label><br>
+                            <button class="power" data-text="{{ instance.State }}" instance-id="{{ instance.InstanceID }}"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="wait_text">인스턴스 데이터 로드 중....</p>
+        {% endif %}
+    </body>    
 </html>
